@@ -70,4 +70,65 @@ public class AuthorControllerIntegrationTests {
                 MockMvcResultMatchers.jsonPath("$.age").value(23)
         );
     }
+
+    @Test
+    public void testThatListAuthorsReturnsHttpStatus200() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatListAuthorsReturnsListOfAuthors() throws Exception {
+        AuthorEntity testAuthorEntityA = TestDataUtil.createTestAuthorEntityA();
+        authorService.createAuthor(testAuthorEntityA);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].id").isNumber()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].name").value("Yash Sonawane")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].age").value(23)
+        );
+    }
+
+    @Test
+    public void testThatGetAuthorReturnsHttpStatus200WhenAuthorExist() throws Exception {
+        AuthorEntity testAuthorEntityA = TestDataUtil.createTestAuthorEntityA();
+        authorService.createAuthor(testAuthorEntityA);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatGetAuthorReturnsAuthorWhenAuthorExist() throws Exception {
+        AuthorEntity testAuthorEntityA = TestDataUtil.createTestAuthorEntityA();
+        authorService.createAuthor(testAuthorEntityA);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.id").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.name").value("Yash Sonawane")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.age").value(23)
+        );
+    }
+
+    @Test
+    public void testThatGetAuthorReturnsHttpStatus404WhenNoAuthorExists() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 }
